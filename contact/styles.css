@@ -1,0 +1,4 @@
+body{font-family:'DM Sans',sans-serif}
+.btn-primary{background:#8C1F28;color:#fff;font-weight:600;border-radius:10px;padding:14px 28px;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;border:none;cursor:pointer}.btn-primary:hover{background:#6b1620}.btn-primary:disabled{opacity:.6;cursor:not-allowed}
+.fi{width:100%;padding:.8rem 1rem;border:1.5px solid #e2e8f0;border-radius:10px;font-size:.95rem;background:#fff;color:#1e293b}.fi:focus{outline:none;border-color:#8C1F28;box-shadow:0 0 0 3px rgba(140,31,40,.1)}
+.hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;opacity:0;overflow:hidden}
