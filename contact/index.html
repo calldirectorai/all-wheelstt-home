@@ -343,7 +343,7 @@
         <div><label for="cf-phone" class="block text-sm font-semibold text-slate-700 mb-1">Phone Number <span class="text-red-600">*</span></label><input type="tel" id="cf-phone" autocomplete="tel" maxlength="20" placeholder="(240) 555-0123" class="fi" required></div>
         <div><label for="cf-email" class="block text-sm font-semibold text-slate-700 mb-1">Email Address <span class="text-red-600">*</span></label><input type="email" id="cf-email" autocomplete="email" maxlength="100" placeholder="you@email.com" class="fi" required></div>
         <div><label for="cf-service" class="block text-sm font-semibold text-slate-700 mb-1">Service Needed <span class="text-red-600">*</span></label><select id="cf-service" class="fi" required><option value="">Select a service...</option><option>Title Transfer</option><option>Registration Renewal</option><option>Temporary Tags</option><option>Historic Tags</option><option>New to Maryland Registration</option><option>Dealer &amp; Fleet Services</option><option>Family Gift Vehicle</option><option>Duplicate Title</option><option>Notary Service</option><option>Auto Insurance</option><option>General Inquiry</option><option>Other</option></select></div>
-        <div><label for="cf-msg" class="block text-sm font-semibold text-slate-700 mb-1">Message <span class="font-normal text-slate-500">(optional)</span></label><textarea id="cf-msg" rows="3" maxlength="600" placeholder="Anything else we should know?" class="fi"></textarea></div>
+        <div><label for="cf-msg" class="block text-sm font-semibold text-slate-700 mb-1">Message <span class="font-normal text-slate-500">(optional)</span></label><textarea id="cf-msg" rows="3" maxlength="2000" placeholder="Anything else we should know?" class="fi"></textarea><p id="cf-msg-count" class="text-xs text-slate-500 mt-1 text-right">0 / 2000</p></div>
         <div><label for="cf-source" class="block text-sm font-semibold text-slate-700 mb-1">How did you hear about us?</label><select id="cf-source" class="fi"><option value="">Select one...</option><option value="QR Code - Business Card">QR Code — Business Card</option><option value="Google Search">Google Search</option><option value="Google Maps">Google Maps</option><option value="Referral">Referral / Word of Mouth</option><option value="Social Media">Social Media</option><option value="Yelp">Yelp</option><option value="Other">Other</option></select></div>
         <div class="hp" aria-hidden="true"><label for="cf-hp">Leave this field empty</label><input type="text" id="cf-hp" name="website" tabindex="-1" autocomplete="off"></div>
         <p id="cf-err" class="hidden text-red-600 font-semibold text-sm" role="alert"></p>
@@ -364,21 +364,22 @@ function $(i){return document.getElementById(i);}
 function initForm(p,defSource,needEmail){
  var form=$(p+'-form');if(!form)return;
  var ok=$(p+'-ok'),err=$(p+'-err'),btn=$(p+'-btn'),t0=0,human=false;
+ var mc=$(p+'-msg'),cc=$(p+'-msg-count');function upd(){if(mc&&cc)cc.textContent=mc.value.length+' / 2000';}if(mc)mc.addEventListener('input',upd);
  form.addEventListener('focusin',function(){if(!t0)t0=Date.now();});
  ['pointerdown','keydown','touchstart'].forEach(function(ev){form.addEventListener(ev,function(){human=true;},{passive:true});});
  function showErr(m){err.textContent=m;err.classList.remove('hidden');}
- function reset(){form.reset();form.classList.remove('hidden');ok.classList.add('hidden');err.classList.add('hidden');btn.disabled=false;btn.textContent=btn.getAttribute('data-label');t0=0;human=false;}
+ function reset(){form.reset();form.classList.remove('hidden');ok.classList.add('hidden');err.classList.add('hidden');btn.disabled=false;btn.textContent=btn.getAttribute('data-label');t0=0;human=false;upd();}
  $(p+'-again').addEventListener('click',reset);
  window.addEventListener('pageshow',function(e){if(e.persisted)reset();});
  form.addEventListener('submit',function(e){
   e.preventDefault();err.classList.add('hidden');
   var name=$(p+'-name').value.trim(),ph=$(p+'-phone').value.replace(/\D/g,''),em=$(p+'-email').value.trim(),sv=$(p+'-service').value,msg=$(p+'-msg').value.trim(),hp=$(p+'-hp').value,se=$(p+'-source'),src=(se&&se.value)||defSource;
   if(ph.length===11&&ph.charAt(0)==='1')ph=ph.slice(1);
-  if(!/^[A-Za-z\u00C0-\u024F][A-Za-z\u00C0-\u024F'’.\- ]{1,79}$/.test(name))return showErr('Please enter your full name.');
+  if(!/^[A-Za-zÀ-ɏ][A-Za-zÀ-ɏ'’.\- ]{1,79}$/.test(name))return showErr('Please enter your full name.');
   if(!/^[2-9]\d{9}$/.test(ph))return showErr('Please enter a valid 10-digit phone number.');
   if((needEmail&&!em)||(em&&(em.length>100||!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em))))return showErr('Please enter a valid email address.');
   if(!sv)return showErr('Please choose the service you need.');
-  if(msg.length>600||/https?:\/\/|www\./i.test(msg))return showErr('Please keep your message under 600 characters and without web links.');
+  if(msg.length>2000||/https?:\/\/|www\./i.test(msg))return showErr('Please keep your message under 2,000 characters and without web links.');
   try{if(Date.now()-(+localStorage.getItem('aw_last')||0)<60000)return showErr('Your request was just sent. Please wait a minute before sending another.');}catch(x){}
   function done(){$(p+'-okmsg').textContent=em?'We\'ll call you back shortly. A confirmation was sent to your email.':'We\'ll call you back shortly.';form.classList.add('hidden');ok.classList.remove('hidden');if(window.gtag)gtag('event','generate_lead',{event_category:'form',event_label:src});setTimeout(reset,15000);}
   if(hp){return done();}
